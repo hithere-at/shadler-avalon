@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Shadler.MainWindow"
+        Title="Shadler">
+    
+    <ui:NavigationView PaneDisplayMode="Left" IsPaneToggleButtonVisible="True">
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Content="Browse" IconSource="Library" Tag="Views.Browser" />
+            <ui:NavigationViewItem Content="History" IconSource="Refresh" Tag="Views.History" IsEnabled="False" />
+            <ui:NavigationViewItem Content="Favorites" IconSource="Favorite" Tag="Views.Favorite" IsEnabled="False" />
+            <ui:NavigationViewItem Content="Downloads" IconSource="Download" Tag="Views.Download" IsEnabled="False" />
+        </ui:NavigationView.MenuItems>
+    </ui:NavigationView>
+    
+</Window>
