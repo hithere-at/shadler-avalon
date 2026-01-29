@@ -1,11 +1,10 @@
-﻿using Avalonia;
-using FluentAvalonia.UI.Controls;
+﻿using System;
+using Avalonia;
+using Avalonia.Interactivity;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Layout;
-
-// using Shadler.DataStructure;
 
 namespace Shadler.UI
 {
@@ -26,9 +25,10 @@ namespace Shadler.UI
             {
                 Width = 204,
                 Height = 240,
+                ClipToBounds = true,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 CornerRadius = new CornerRadius(8, 8, 0, 0),
-                Margin = new Thickness(-2, -16, 0, 9),
+                Margin = new Thickness(0, -10, 0, 9),
             };
 
             contentImageContainer.Child = contentImage;
@@ -73,8 +73,8 @@ namespace Shadler.UI
 
             MenuItem openContentOptions = new MenuItem
             {
-                Icon = new SymbolIcon {Symbol=Symbol.Favorite},
-                Header = "Add to favorites",
+                Icon = new FluentAvalonia.UI.Controls.SymbolIcon { Symbol = FluentAvalonia.UI.Controls.Symbol.Favorite },
+                Header = "Add to favorites"
             };
 
             ctxMenu.Items.Add(openContentOptions);
@@ -93,14 +93,13 @@ namespace Shadler.UI
             return button;
         }
 
-        /*
-        public static Grid CreateShadlerEpisodeButton(string episode, RoutedEventHandler playButtonEvent)
+
+        public static Grid CreateShadlerEpisodeButton(string episode, EventHandler<RoutedEventArgs> playButtonEvent)
         {
             Grid episodeViewerGrid = new Grid
             {
-                CornerRadius = new CornerRadius(4),
                 Margin = new Thickness(0, 6, 0, 0),
-                Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0x0F, 0xFF, 0x0FF, 0x0FF))
+                Background = new SolidColorBrush(0x0FFFFFFF)
             };
 
             episodeViewerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0, GridUnitType.Auto) });
@@ -121,11 +120,7 @@ namespace Shadler.UI
                 Tag = episode,
                 Margin = new Thickness(0, 12, 12, 12),
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Content = new FontIcon
-                {
-                    FontFamily = new FontFamily("Segoe Fluent Icons"),
-                    Glyph = "\uE768"
-                }
+                Content = new FluentAvalonia.UI.Controls.SymbolIcon { Symbol = FluentAvalonia.UI.Controls.Symbol.Play }
             };
 
             Button downloadButton = new Button
@@ -134,11 +129,7 @@ namespace Shadler.UI
                 Margin = new Thickness(0, 12, 12, 12),
                 HorizontalAlignment = HorizontalAlignment.Right,
                 IsEnabled = false, // download feature is not implemented yet
-                Content = new FontIcon
-                {
-                    FontFamily = new FontFamily("Segoe Fluent Icons"),
-                    Glyph = "\uE896",
-                }
+                Content = new FluentAvalonia.UI.Controls.SymbolIcon { Symbol = FluentAvalonia.UI.Controls.Symbol.Download }
             };
 
             playButton.Click += playButtonEvent;
@@ -154,6 +145,7 @@ namespace Shadler.UI
             return episodeViewerGrid;
 
         }
-        */
+
+
     }
 }

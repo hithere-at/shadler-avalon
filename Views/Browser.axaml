@@ -25,7 +25,7 @@
                 </DropDownButton.Flyout>
             </DropDownButton>
 
-            <AutoCompleteBox x:Name="QueryBox" TextChanged="Search_TextChanged" Width="270" HorizontalAlignment="Right" />
+            <AutoCompleteBox x:Name="QueryBox" TextChanged="Search_TextChanged" KeyDown="Search_Click" Width="270" HorizontalAlignment="Right" />
 
         </Grid>
 

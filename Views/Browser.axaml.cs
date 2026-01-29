@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media.Imaging;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -22,15 +23,30 @@ public partial class Browser : UserControl
     public Browser()
     {
         this.InitializeComponent();
+    }
 
+    private void Search_Click(object sender, KeyEventArgs args)
+    {
+        if (sender is AutoCompleteBox queryBox && args.Key == Key.Enter)
+        {
+            currentQuery = queryBox.Text;
+            SearchQuery(currentQuery);
+
+        }
     }
 
     private void Search_TextChanged(object sender, TextChangedEventArgs args)
     {
         if (sender is AutoCompleteBox queryBox)
         {
-            currentQuery = queryBox.Text;
-            SearchQuery(currentQuery);
+            if (queryBox.Text == "")
+            {
+                ContentViewerFrame.BackStack.Clear();
+                ContentViewerFrame.Content = null;
+                ContentGrid.Children.Clear();
+                shadlerContents.Clear();
+            }
+
         }
     }
 
@@ -50,16 +66,7 @@ public partial class Browser : UserControl
         {
             ShadlerHttp.SetDefaultHeader(client);
 
-            string queryUrl;
-
-            if (currentContentType == "Anime")
-            {
-                queryUrl = Anime.GetQueryUrl(query);
-            }
-            else
-            {
-                queryUrl = Manga.GetQueryUrl(query);
-            }
+            string queryUrl = currentContentType == "Anime" ? Anime.GetQueryUrl(query) : Manga.GetQueryUrl(query);
 
             HttpResponseMessage response = await client.GetAsync(queryUrl);
 
@@ -68,33 +75,25 @@ public partial class Browser : UserControl
                 string responseData = await response.Content.ReadAsStringAsync();
                 using (JsonDocument doc = JsonDocument.Parse(responseData))
                 {
-                    string what = currentContentType == "Anime" ? "shows" : "mangas";
+                    string type = currentContentType == "Anime" ? "shows" : "mangas";
                     int count = 0;
 
                     JsonElement root = doc.RootElement;
-                    JsonElement contentResults;
 
                     ContentViewerFrame.BackStack.Clear();
                     ContentViewerFrame.Content = null;
                     ContentGrid.Children.Clear();
                     shadlerContents.Clear();
 
-                    if (root.TryGetProperty("data", out contentResults))
-                    {
-                        contentResults = contentResults.GetProperty(what).GetProperty("edges");
-                    }
-                    else
-                    {
-                        // silently fail if the data doesnt exist because API not API'ing
-                        return;
-                    }
+                    JsonElement contentResults = root.TryGetProperty("data", out contentResults)
+                    ? contentResults.GetProperty(type).GetProperty("edges")
+                    : new JsonElement();
 
                     foreach (JsonElement content in contentResults.EnumerateArray())
                     {
 
                         string? id = content.GetProperty("_id").GetString();
                         string? title = content.GetProperty("name").GetString();
-                        string year;
 
                         string? thumbnailUrl = content.GetProperty("thumbnail").GetString();
                         thumbnailUrl = !thumbnailUrl.StartsWith("https://")
@@ -108,15 +107,9 @@ public partial class Browser : UserControl
 
 
                         JsonElement date = content.GetProperty("airedStart");
-
-                        if (date.TryGetProperty("year", out JsonElement yearElement))
-                        {
-                            year = yearElement.ToString();
-                        }
-                        else
-                        {
-                            year = " ";
-                        }
+                        string year = date.TryGetProperty("year", out JsonElement yearElement)
+                        ? yearElement.ToString()
+                        : " ";
 
                         Bitmap thumbnailImage;
 
@@ -156,9 +149,16 @@ public partial class Browser : UserControl
     }
 
     private void SelectContent_Event(object sender, RoutedEventArgs args) {
-        if (sender is Button) {
-            // TODO
+        if (sender is Button shadlerContentButton) {
+
             Console.WriteLine("[INFO] SelectContent_Event callback fired");
+
+            int index = int.Parse(shadlerContentButton.Tag.ToString());
+            ContentViewerFrame.Navigate(typeof(ContentViewer), shadlerContents[index]);
+
+            ContentViewerFrame.BackStack.Clear();
+            ContentGrid.Children.Clear();
+
         }
     }
 
