@@ -1,0 +1,44 @@
+<UserControl
+    xmlns="http://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:labs="using:Avalonia.Labs.Controls"
+    xmlns:local="using:Shadler.Views"
+    x:Class="Shadler.Views.MangaReader"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Visible">
+
+        <Grid Margin="12">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                <TextBlock x:Name="PlayerTitle" FontSize="32" />
+                <TextBlock x:Name="PlayerYear" Margin="14,0,0,0" FontSize="32" Opacity="0.5"/>
+            </StackPanel>
+
+            <FlipView x:Name="PageScroller" Grid.Row="1" Width="600" Height="600" />
+
+            <Grid Grid.Row="2">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="PreviousButton" Click="PreviousChapterClick" Content="Previous chapter" HorizontalAlignment="Left"/>
+                <Button x:Name="NextButton" Grid.Column="1" Click="NextChapterClick" Content="Next chapter" HorizontalAlignment="Right"/>
+
+            </Grid>
+
+        </Grid>
+
+    </ScrollViewer>
+
+</userControl>

@@ -50,6 +50,18 @@ public partial class Browser : UserControl
         }
     }
 
+    private void ShowErrorMessage() {
+
+        ContentGrid.Children.Add(new TextBlock
+        {
+            Text = "Uh oh. Something has gone really wrong. Please try again.",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            FontSize = 16
+        });
+
+    }
+
     private async void SearchQuery(string query)
     {
 
@@ -73,6 +85,7 @@ public partial class Browser : UserControl
             if (response.IsSuccessStatusCode)
             {
                 string responseData = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseData);
                 using (JsonDocument doc = JsonDocument.Parse(responseData))
                 {
                     string type = currentContentType == "Anime" ? "shows" : "mangas";
@@ -85,9 +98,16 @@ public partial class Browser : UserControl
                     ContentGrid.Children.Clear();
                     shadlerContents.Clear();
 
-                    JsonElement contentResults = root.TryGetProperty("data", out contentResults)
-                    ? contentResults.GetProperty(type).GetProperty("edges")
-                    : new JsonElement();
+                    JsonElement contentResults;
+
+                    if (root.TryGetProperty("data", out contentResults))
+                    {
+                        contentResults = contentResults.GetProperty(type).GetProperty("edges");
+                    } else
+                    {
+                        ShowErrorMessage();
+                        return;
+                    }
 
                     foreach (JsonElement content in contentResults.EnumerateArray())
                     {
@@ -137,15 +157,49 @@ public partial class Browser : UserControl
             }
             else
             {
-                ContentGrid.Children.Add(new TextBlock
-                {
-                    Text = "Uh oh. Something has gone really wrong. Please try again.",
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 16
-                });
+                ShowErrorMessage();
             }
         }
+    }
+
+    private void ContentMenu_Click(object sender, RoutedEventArgs args)
+    {
+
+        if (sender is MenuItem item)
+        {
+            if (item.Header?.ToString() == currentContentType)
+            {
+                return; // dont reload if the selected content type is the same as the current one
+
+            }
+            else
+            {
+
+                ContentViewerFrame.BackStack.Clear();
+                ContentViewerFrame.Content = null;
+                ContentGrid.Children.Clear();
+                shadlerContents.Clear();
+
+                switch (item.Header?.ToString())
+                {
+                    case "Anime":
+                        currentContentType = "Anime";
+                        ContentTypeDropDown.Content = "Anime";
+                        break;
+
+                    case "Manga":
+                        currentContentType = "Manga";
+                        ContentTypeDropDown.Content = "Manga";
+                        break;
+
+                    default:
+                        return;
+                }
+
+            }
+
+        }
+
     }
 
     private void SelectContent_Event(object sender, RoutedEventArgs args) {

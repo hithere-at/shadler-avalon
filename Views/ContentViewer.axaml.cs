@@ -6,6 +6,7 @@ using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Controls;
 using System;
 using System.Net;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -182,7 +183,7 @@ public partial class ContentViewer : UserControl
         }
     }
 
-    private void PlayButton_Click(object sender, RoutedEventArgs args)
+    private async void PlayButton_Click(object sender, RoutedEventArgs args)
     {
         // ContentDetails.Children.Clear();
 
@@ -193,16 +194,22 @@ public partial class ContentViewer : UserControl
 
         if (playerContent.ContentType == "Anime")
         {
-            playerContent.StreamsUrl = Anime.GetStreamUrl(playerContent.Id, episodeString);
-            Console.WriteLine($"[INFO] PlayButton_Click callback fired: contentType -> {playerContent.ContentType} ; StreamsUrl -> {playerContent.StreamsUrl}");
-            //PlayerViewerFrame.Navigate(typeof(AnimePlayer), playerContent);
+            string videoUrl = await Anime.GetVideoStreamUrl(playerContent.Id, episodeString);
+
+            ProcessStartInfo procInfo = new ProcessStartInfo("mpv");
+            procInfo.ArgumentList.Add($"--force-media-title={playerContent.Title} Episode {episodeString}");
+            procInfo.ArgumentList.Add(videoUrl);
+
+            Process.Start(procInfo);
         }
+
         else if (playerContent.ContentType == "Manga")
         {
             playerContent.StreamsUrl = Manga.GetStreamUrl(playerContent.Id, episodeString);
             Console.WriteLine($"[INFO] PlayButton_Click callback fired: contentType -> {playerContent.ContentType} ; StreamsUrl -> {playerContent.StreamsUrl}");
             //PlayerViewerFrame.Navigate(typeof(MangaReader), playerContent);
         }
+
     }
 
     private void DownloadButton_Click(object sender, RoutedEventArgs args)

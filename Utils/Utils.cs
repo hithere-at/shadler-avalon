@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Shadler.Utilities
 {
@@ -34,13 +37,32 @@ namespace Shadler.Utilities
             return fullUrl;
         }
 
-        public static string GetStreamUrl(string id, string episode)
+        public static async Task<String> GetVideoStreamUrl(string id, string episode)
         {
             string streamVar = ANIME_STREAM_VARS.Replace("#ANIME_ID#", id).Replace("#EPISODE#", episode);
             string extVar = API_EXT.Replace("#HASH#", ANIME_STREAM_HASH);
             string fullUrl = "https://api.allanime.day/api?variables=" + streamVar + "&extensions=" + extVar;
+            string videoUrl;
 
-            return fullUrl;
+            using (HttpClient client = new HttpClient()) {
+                ShadlerHttp.SetDefaultHeader(client);
+
+                string response = await client.GetStringAsync(fullUrl);
+                Console.WriteLine(response);
+                Regex regex = new Regex("apivtwo/[^\"]*");
+                Match match = regex.Match(response);
+                string matchedString = match.Value.Replace("clock", "clock.json").Replace("/dr", "");
+
+                response = await client.GetStringAsync("http://blog.allanime.day/" + matchedString);
+                Console.WriteLine(response);
+                JsonDocument doc = JsonDocument.Parse(response);
+                JsonElement root = doc.RootElement;
+                videoUrl = root.GetProperty("links")[0].GetProperty("link").ToString();
+
+            }
+
+            return videoUrl;
+
         }
 
         public static string GetDetailUrl(string id)
@@ -51,7 +73,6 @@ namespace Shadler.Utilities
             return fullUrl;
         }
 
-
     }
 
     public static class Manga
@@ -59,9 +80,9 @@ namespace Shadler.Utilities
 
         private static string MANGA_QUERY_VARS = "{%22search%22:{%22query%22:%22#QUERY#%22,%22isManga%22:true},%22limit%22:26,%22page%22:1,%22translationType%22:%22sub%22,%22countryOrigin%22:%22ALL%22}";
         private static string MANGA_READ_VARS = "{%22mangaId%22:%22#MANGA_ID#%22,%22translationType%22:%22sub%22,%22chapterString%22:%22#CHAPTER#%22,%22limit%22:10,%22offset%22:0}";
-        private static string MANGA_QUERY_HASH = "a27e57ef5de5bae714db701fb7b5cf57e13d57938fc6256f7d5c70a975d11f3d";
-        private static string MANGA_READ_HASH = "121996b57011b69386b65ca8fc9e202046fc20bf68b8c8128de0d0e92a681195";
-        private static string MANGA_DETAIL_HASH = "529b0770601c7e04c98566c7b7bb3f75178930ae18b3084592d8af2b591a009f";
+        private static string MANGA_QUERY_HASH = "3a4b7e9ef62953484a05dd40f35b35b118ad2ff3d5e72d2add79bcaa663271e7";
+        private static string MANGA_READ_HASH = "4a048654fbac31f11e201ac8bd34d748b514c28d2781b674d057d064282e620e";
+        private static string MANGA_DETAIL_HASH = "90024aeae9c1a4d3ace0473871dd1902e47fbcb8781ccbcd8ad81f8bb1f313ee";
 
         private static string API_EXT = "{%22persistedQuery%22:{%22version%22:1,%22sha256Hash%22:%22#HASH#%22}}";
         private static string DETAIL_VARS = "{%22_id%22:%22#DEATH#%22}";

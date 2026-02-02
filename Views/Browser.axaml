@@ -19,8 +19,8 @@
             <DropDownButton x:Name ="ContentTypeDropDown" Content="Anime" HorizontalAlignment="Left">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
-                        <MenuItem Header="Anime" />
-                        <MenuItem Header="Manga" />
+                        <MenuItem Header="Anime" Click="ContentMenu_Click" />
+                        <MenuItem Header="Manga" Click="ContentMenu_Click"/>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>
